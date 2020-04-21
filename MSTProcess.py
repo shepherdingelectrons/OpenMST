@@ -1,12 +1,10 @@
 import sqlite3
 from struct import *
-import xlsxwriter
-from xlsxwriter.utility import xl_rowcol_to_cell
 import os.path
 
 # See examples for usage
     
-def ExtractMSTTrace(blob):        
+def ExtractMSTTrace(blob, norm=False):        
     i=0
     x=[]
     y=[]
@@ -23,9 +21,15 @@ def ExtractMSTTrace(blob):
         y.append(c[1])
 
         i = i + 8
+
+    if norm==True:# Normalise data before returning it       
+        total = [y[i] for i,x in enumerate(x) if x<0]
+        average = sum(total)*1.0/len(total)
+        y = [1000.0*j/average for j in y]
+    
     return (x,y)
 
-def ExtractCapTrace(blob):        
+def ExtractCapTrace(blob, xoffset=0, norm=False):    
         i=0
         x=[]
         y=[]
@@ -38,10 +42,14 @@ def ExtractCapTrace(blob):
             a = blob[i:i+16]
             c = unpack('ffff',a)
 
-            x.append(c[0])
+            x.append(c[0]-xoffset)
             y.append(c[3])
 
             i = i + 16
+        
+        if norm==True: # Normalise to 1.0
+            height = max(y)
+            y = [1.0*j/height for j in y]
         return (x,y)
 
 def checkisSingle(array, arrayname, ident, identname):
@@ -79,6 +87,8 @@ class MSTCapillary:
         self.MST_trace = None # MST trace data here
         self.preMST = None # scan cap data here
         self.postMST = None # scan cap data here
+
+        self.CenterPosition = 0
 
         self.capillary_annotation = []
         
@@ -121,6 +131,7 @@ class MSTExperiment:
                     self.capillary[i].preMST = scancapinfo["CapScanTrace"]
                     capinfo["ExcitationPower"] = scancapinfo["ExcitationPower"]
                     capinfo["CenterPosition"] = scancapinfo["CenterPosition"]
+                    self.capillary[i].CenterPosition = capinfo["CenterPosition"]
                 else:
                     # Post_MST capscan
                     self.capillary[i].postMST = scancapinfo["CapScanTrace"]
@@ -321,6 +332,9 @@ class MSTFile:
 
 #############################################################################
 def WriteExperimentToXLSX(experiment, filename):
+    import xlsxwriter
+    from xlsxwriter.utility import xl_rowcol_to_cell
+
     workbook = xlsxwriter.Workbook(filename)
     bold = workbook.add_format({'bold': True})
     centre = workbook.add_format({'align': 'center'})
@@ -401,24 +415,25 @@ def WriteExperimentToXLSX(experiment, filename):
         scansheet.write(2,column+6,"reldist",centre)
         scansheet.write(2,column+7,"norm",centre)
 
+        cp = cap.CenterPosition
         x,y = ExtractCapTrace(cap.preMST)
-        cp = cap.capinfo["CenterPosition"]
-
+        x_rel, y_norm  = ExtractCapTrace(cap.preMST, xoffset=cp, norm=True)
+        
         if notdeleted:      
-            norm = max(y)
             for i in range(len(x)):
                 scansheet.write(3+i,column,x[i])
                 scansheet.write(3+i,column+1,y[i])
-                scansheet.write(3+i,column+2,x[i]-cp)
-                scansheet.write(3+i,column+3,100.0*y[i]/norm)
+                scansheet.write(3+i,column+2,x_rel[i])
+                scansheet.write(3+i,column+3,y_norm[i])
                 
             x,y = ExtractCapTrace(cap.postMST)
-            norm = max(y)
+            x_rel, y_norm  = ExtractCapTrace(cap.postMST, xoffset=cp, norm=True)
+    
             for i in range(len(x)):
                 scansheet.write(3+i,column+4,x[i])
                 scansheet.write(3+i,column+5,y[i])
-                scansheet.write(3+i,column+6,x[i]-cp)
-                scansheet.write(3+i,column+7,100.0*y[i]/norm)
+                scansheet.write(3+i,column+6,x_rel[i])
+                scansheet.write(3+i,column+7,y_norm[i])
             
         startID = xl_rowcol_to_cell(3, column) # pre-MST
         endID = xl_rowcol_to_cell(2+len(x), column)
@@ -480,15 +495,13 @@ def WriteExperimentToXLSX(experiment, filename):
 
         # Calculate Fnorm-100%
         x,y = ExtractMSTTrace(cap.MST_trace)
+        x,y_norm = ExtractMSTTrace(cap.MST_trace, norm=True)
 
-        if notdeleted: 
-            total = [y[i] for i,x in enumerate(x) if x<0]
-            average = sum(total)*1.0/len(total)
-            
+        if notdeleted:    
             for i in range(len(x)):
                 MSTsheet.write(2+i,column,x[i])
                 MSTsheet.write(2+i,column+1,y[i])
-                MSTsheet.write(2+i,column+2,1000.0*y[i]/average)
+                MSTsheet.write(2+i,column+2,y_norm[i])
 
         startID = xl_rowcol_to_cell(2, column)
         endID = xl_rowcol_to_cell(1+len(x), column)
