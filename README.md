@@ -8,9 +8,9 @@ Simply place **MSTProcess.py** in the folder with your scripts and import it.  S
 
 ## Dependencies 
 
-**sqlite3** - OpenMST was tested in Python 3.2.2, and uses sqlite3, which comes with this version of Python, but might need to be installed if you're using a diferent version of Python 
+**sqlite3** - OpenMST was tested in Python 3.2.2, and uses sqlite3 which comes with this version of Python.  It might need to be installed if you're using a different version of Python 
 
-**xlsxwriter** - Used for exporting extracted data to Excel, in table format and generating the capillary scan and MST trace charts. 
+**xlsxwriter** - Used for exporting extracted data to Excel, in table format and generating the capillary scan and MST trace charts. Only used if saving to XLSX. 
 
 ## Usage
 
