@@ -1,6 +1,7 @@
 # OpenMST
-NanoTemper MST data sits in .MOC and requires specialist software to access - until now! 
-This python script processes NanoTemper MST .MOC files and generates Excel files (*.XLSX) with the extracted data.
+[Microscale Thermophoresis](https://en.wikipedia.org/wiki/Microscale_thermophoresis) (MST) is a biophysical technique that meaures how fluorescently labelled proteins, DNA and small molecules move in response to an induced thermal gradient, and is used increasingly to characterise molecular interactions.  
+
+NanoTemper MST instruments produce data in a custom .MOC format that requires specialist (and expensive) software to open.  OpenMST is a python program that processes NanoTemper MST .MOC files and generates Excel files (.XLSX) with the extracted data.
 
 ## Installation
 
@@ -23,7 +24,7 @@ MOCfile.SaveXLSX()
 MOCfile.close()
 ```
 
-The above may be sufficient for simply extracting data from .MOC for viewing in Excel. However more selective programatic control and access to the extracted MST data is possible (also see examples for details).
+The above code is sufficient for simply extracting data from .MOC for viewing in Excel. However more selective programatic control and access to the extracted MST data is possible (also see examples for details).
 
 We can open a .MOC file using and perform processing on all the contained experiments, including populating each experiment with all the relevant capillary data. Note that 'None' is returned if the .MOC file can't be opened.
 ```python
@@ -32,7 +33,7 @@ import MSTProcess as MST
 MOCfile = MST.openMOCFile('Your_filename_here.moc')
 MOCfile.Process() # Extracts all the experiments in the MOC file, and populates with all the capillary information
 ```
-If we wanted, we could choose to only populate the capillary data for certain experimenta, i.e experiments #0 and #2:
+If we wanted, we could choose to only populate the capillary data for certain experiments, i.e experiments #0 and #2:
 ```python
 import MSTProcess as MST
 
@@ -57,9 +58,7 @@ print(cap6.capinfo)
 print(cap6.MSTinfo)
 print(cap6.CenterPosition)
 ```
-The actual raw data of the pre/post capillary scans and the MST traces themselves are extracted from the .MOC file as a byte array.   For the record, from inspection of the binary blob, it was apparent that the capillary scan data stream is comprised of 16-byte chunks, of 4 floating-point numbers, two of which hold the important data.  Similarly for the MST traces, the binary blob is comprised of 8-byte chunks of the 2 floating numbers of interest.  
-
-The pre-MST capillary scan, the post-MST capillary scan and the MST trace are saved in the capillary object as blobs, under the names; .preMST, .postMST and .MST_trace respectively.  The functions to convert the blobs to understandable data are MST.ExtractMSTTrace and MST.ExtractCapTrace.  So then, we can access this data directly:
+The raw data of the pre/post capillary scans and the MST traces themselves are extracted from the .MOC file as a byte array.  The pre-MST capillary scan, the post-MST capillary scan and the MST trace are saved in the capillary object as blobs, under the names; .preMST, .postMST and .MST_trace respectively.  The functions to convert the blobs to understandable data are MST.ExtractMSTTrace and MST.ExtractCapTrace.  So then, we can access this data directly:
 ```python
 cap6 = MOCfile.experiment[0].capillary[5] # For readability, get a reference to the 6th capillary of experiment 0
 
