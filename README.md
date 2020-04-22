@@ -3,6 +3,7 @@
 
 NanoTemper MST instruments produce data in a custom .MOC format that requires specialist (and expensive) software to open.  OpenMST is a python program that processes NanoTemper MST .MOC files and generates Excel files (.XLSX) with the extracted data.
 
+![OpenMST graphic](/images/OpenMST.jpg)
 ## Installation
 
 Simply place **MSTProcess.py** in the folder with your scripts and import it.  See the examples for Usage
