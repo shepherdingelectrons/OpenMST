@@ -59,6 +59,11 @@ Copy the .MOC files you are interested in analysing into the same folder.
 IDLE is the Python editor.  Right click on example.py in the folder where you have placed it and click "Edit with IDLE", making sure it is the version of Python you just installed.
 ![edit example script with IDLE](/images/Edit_with_IDLE.jpg)
 
+**(5) Edit and run the script**
+
+You should see the following Python code in the IDLE window:
+![Example script in IDLE](/images/example_py.jpg)
+
 Simply change 'Your_filename_here.moc' to the MOC filename in the same folder that you want to process (keeping the filename within the quotation marks).  Press F5 to run the script, or from the menu at the top of the editor, Run--> Run Module.  All things being well, you should see:
 ```
 Processing file
