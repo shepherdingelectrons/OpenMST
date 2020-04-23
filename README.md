@@ -13,7 +13,7 @@ Simply download **[MSTProcess.py](https://raw.githubusercontent.com/shepherdinge
 More advanced users may want to setup the script as a site-package, so that it can be imported from any script folder.  To do this:
 1. Locate the folder containing the version of python on your machine (i.e. ..\AppData\Local\Programs\Python\Python38)
 2. In Lib\site-packages, make a folder 'OpenMST'
-3. Place the MSTProcees.py script within the OpenMST folder, and make a __init__.py file (empty) and save it in the same folder. 
+3. Place the MSTProcess.py script within the OpenMST folder, and make a ```__init__.py``` file (empty) and save it in the same folder. 
 
 Open IDLE and try ```import OpenMST.MSTProcess as MST``` .  No error will indicate success!
 
