@@ -50,13 +50,13 @@ A warning message about the pip version might appear, but it can be safely ignor
 
 **(3) Getting the OpenMST python library**
 
-Download the **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** script (right click and click "Save link as..." as save the file to a new folder you want to work in.
+Download the **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** script (right click and click "Save link as..." and save the file to a new folder you want to work in.
 Download the **[example.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/example.py)** script in the same way, to the same folder.
 Copy the .MOC files you are interested in analysing into the same folder.
 
 **(4)  Open IDLE**
 
-IDLE is the Python editor.  Right click on example.py in the folder where you downloaded it and click "Edit with IDLE", making sure it is the version of Python you just installed.
+IDLE is the Python editor.  Right click on example.py in the folder where you have placed it and click "Edit with IDLE", making sure it is the version of Python you just installed.
 ![edit example script with IDLE](/images/Edit_with_IDLE.jpg)
 
 Simply change 'Your_filename_here.moc' to the MOC filename in the same folder that you want to process (keeping the filename within the quotation marks).  Press F5 to run the script, or from the menu at the top of the editor, Run--> Run Module.  All things being well, you should see:
