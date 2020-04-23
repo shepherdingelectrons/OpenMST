@@ -8,7 +8,7 @@ NanoTemper MST instruments produce data in a custom .MOC format that requires sp
 
 Simply download **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** and place in the folder with your MOC files and import it with ```import MSTProcess```.  See the examples for simple usage, and also [More advanced usage](#more-advanced-usage).  
 
-**The OpenMST script doesn't modify the MOC files, but work with copies of the MOC file, just in case**
+**NOTICE: The OpenMST script doesn't modify the MOC files, but work with copies of the MOC file to be safe**
 
 More advanced users may want to setup the script as a site-package, so that it can be imported from any script folder.  To do this:
 1. Locate the folder containing the version of python on your machine (i.e. ..\AppData\Local\Programs\Python\Python38)
@@ -38,7 +38,7 @@ Using the latest version of Python 3, and making that python is added to the PAT
 
 For reference, instructions can be found here: https://xlsxwriter.readthedocs.io/getting_started.html
 
-And the easiest method with PIP is detailed below:
+The easiest method to install xlsxwriter with PIP is detailed below:
 In Windows, open a command prompt by searching for "cmd" and running it as you would search for any program in Windows.
 In the black box that appears, type:
 
@@ -50,8 +50,8 @@ A warning message about the pip version might appear, but it can be safely ignor
 
 **(3) Getting the OpenMST python library**
 
-Download the MSTProcess.py script (right click and click "Save link as..." as save the file to a new folder you want to work in.
-Download the example.py script in the same way, to the same folder.
+Download the **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** script (right click and click "Save link as..." as save the file to a new folder you want to work in.
+Download the **[example.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/example.py)** script in the same way, to the same folder.
 Copy the .MOC files you are interested in analysing into the same folder.
 
 **(4)  Open IDLE**
