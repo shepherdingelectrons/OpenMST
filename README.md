@@ -14,7 +14,51 @@ Simply place **MSTProcess.py** in the folder with your scripts and import it.  S
 
 **xlsxwriter** - Used for exporting extracted data to Excel, in table format and generating the capillary scan and MST trace charts. Only used if saving to XLSX. 
 
-## Usage
+## Help! I don't know anything about Python: Super Simple Installation & Usage Instructions
+Follow these instructions if you want to keep things as simple as possible
+
+**(1) Install Python 3**
+
+Install Python 3 from the official website: https://www.python.org/downloads/  At the time of writing the latest release is Python 3.8.2. Download  and run the installer, making sure to check the "Add Python 3.8 to PATH" box.
+
+![Add python to path](/images/Add_python38_to_path.jpg)
+
+**(2) Install python module "xlsxwriter"**
+
+Using the latest version of Python 3, and making that python is added to the PATH makes this much easier than it would otherwise be.
+
+For reference, instructions can be found here: https://xlsxwriter.readthedocs.io/getting_started.html
+
+And the easiest method with PIP is detailed below:
+In Windows, open a command prompt by searching for "cmd" and running it as you would search for any program in Windows.
+In the black box that appears, type:
+
+```
+pip install XlsxWriter
+```
+A warning message about the pip version might appear, but it can be safely ignored for our purposes.  You can close the command window now.
+![pip install XlsxWriter](/images/pip_install_XlsxWriter.jpg)
+
+**(3) Getting the OpenMST python library**
+
+Download the MSTProcess.py script (right click and click "Save link as..." as save the file to a new folder you want to work in.
+Download the example.py script in the same way, to the same folder.
+Copy the .MOC files you are interested in analysing into the same folder.
+
+**(4)  Open IDLE**
+
+IDLE is the Python editor.  Right click on example.py in the folder where you downloaded it and click "Edit with IDLE", making sure it is the version of Python you just installed.
+![edit example script with IDLE](/images/Edit_with_IDLE.jpg)
+
+Simply change 'Your_filename_here.moc' to the MOC filename in the same folder that you want to process (keeping the filename within the quotation marks).  Press F5 to run the script, or from the menu at the top of the editor, Run--> Run Module.  All things being well, you should see:
+```
+Processing file
+Saving experiments to XLSX files
+Finished exporting!
+```
+If you see this text - congratulations - you have successfully set everything up and you have just processed your file! Look in the same folder as the MOC files, and you'll see the extracted MST data in the excel files, one per experiment.  Good luck!
+
+## More advanced usage
 
 ```python
 import MSTProcess as MST
