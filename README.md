@@ -8,6 +8,13 @@ NanoTemper MST instruments produce data in a custom .MOC format that requires sp
 
 Simply place **MSTProcess.py** in the folder with your scripts and import it.  See the examples for Usage
 
+More advanced users may want to setup the script as a site-package, so that it can be imported from any script folder.  To do this:
+1. Locate the folder containing the version of python on your machine (i.e. ..\AppData\Local\Programs\Python\Python38)
+2. In Lib\site-packages, make a folder 'MSTProcess'
+3. Place the MSTProcees.py script within, and make a __init__.py file (empty)
+
+Open IDLE and try import MSTProcess.  No error will indicate success.
+
 ## Dependencies 
 
 **sqlite3** - OpenMST was tested in Python 3.2.2, and uses sqlite3 which comes with this version of Python.  It might need to be installed if you're using a different version of Python 
