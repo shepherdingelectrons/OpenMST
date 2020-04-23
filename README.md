@@ -6,14 +6,16 @@ NanoTemper MST instruments produce data in a custom .MOC format that requires sp
 ![OpenMST graphic](/images/OpenMST.jpg)
 ## Installation
 
-Simply place **MSTProcess.py** in the folder with your scripts and import it.  See the examples for Usage
+Simply download **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** and place in the folder with your MOC files and import it with ```import MSTProcess```.  See the examples for simple usage, and also [More advanced usage](#more-advanced-usage).  
+
+**The OpenMST script doesn't modify the MOC files, but work with copies of the MOC file, just in case**
 
 More advanced users may want to setup the script as a site-package, so that it can be imported from any script folder.  To do this:
 1. Locate the folder containing the version of python on your machine (i.e. ..\AppData\Local\Programs\Python\Python38)
-2. In Lib\site-packages, make a folder 'MSTProcess'
-3. Place the MSTProcees.py script within, and make a __init__.py file (empty)
+2. In Lib\site-packages, make a folder 'OpenMST'
+3. Place the MSTProcees.py script within the OpenMST folder, and make a __init__.py file (empty) and save it in the same folder. 
 
-Open IDLE and try import MSTProcess.  No error will indicate success.
+Open IDLE and try ```import OpenMST.MSTProcess as MST``` .  No error will indicate success!
 
 ## Dependencies 
 
