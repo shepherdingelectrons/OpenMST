@@ -230,17 +230,21 @@ class MSTFile:
 
         self.experiment = []
 
+        self.Process() # Experiment information is now extracted automatically
+
     def getMachineInfo(self):
         self.cursor.execute("SELECT DeviceType, SerialNumber, MacAddress FROM tDevice")
         info = [x for x in self.cursor.fetchall()[0]]
         self.DeviceType, self.SerialNumber, self.MacAddress = info
         return info
 
-    def getAllExperiments(self):
+    def getAllExperiments(self, verbose=True):
         allExperiments = self._gettContainerIDs()
         ExpertModeaIDs = self.getExpertModeaIDs()
         BindingAffinityaIDs = self.getBindingAffinityaIDs()
 
+        self.experiment = [] # Clear experiments
+        
         for i, tcontID in enumerate(allExperiments):
             self.experiment.append(MSTExperiment())
 
@@ -266,18 +270,25 @@ class MSTFile:
             self.experiment[i].experiment_annotation = exp_annon
             self.experiment[i].info.pop("Annotations")
 
-    def Process(self):
-        self.getAllExperiments()
-        self.getAllCapillaryData()
+            if verbose: print("Experiment #",i,":OK")
+
+    def Process(self,verbose=True):
+        if verbose: print("Extracting experimental data from file:",self.filebase+".MOC")
+        self.getAllExperiments(verbose)
+        if verbose: print("Number of experiments extracted:",len(self.experiment))
+        if verbose: print("Extracting capillary data")
+        if verbose: self.getAllCapillaryData(verbose)
+        print("Done!")
 
     def SaveXLSX(self):
         for i, exp in enumerate(self.experiment):
             filename = self.filebase+"_exp"+str(i)+".xlsx"
             WriteExperimentToXLSX(exp,filename)       
 
-    def getAllCapillaryData(self):
+    def getAllCapillaryData(self, verbose=True):
         for i in range(len(self.experiment)):
             self.experiment[i].getCapillaryData()
+            if verbose: print("Capillary data for experiment #",i,":OK")
 
     def getExpertModeaIDs(self):
         self.cursor.execute("SELECT TopmostAction FROM ExpertModeEntity")

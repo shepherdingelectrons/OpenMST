@@ -1,27 +1,20 @@
-import MSTProcess as MST
+import OpenMST.MSTProcess as MST
 
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
+MOCfile = MST.openMOCFile('Your filename here.moc')
 
 # Get machine info
 machinfo = MOCfile.getMachineInfo()
 print("Machine information:", machinfo)
 
-MOCfile.getAllExperiments()
-print("Get experiments:",len(MOCfile.experiment))
+print("Number of experiments:",len(MOCfile.experiment))
 
-print("Get all capillary data from all experiments")
-MOCfile.getAllCapillaryData()
-print("Done")
-
-# or
-#mst.experiment[2].getCapillaryData()
-# to get the capillary data for the 3rd ([2]) experiment
-
-# Now go through and save experiments to files:
+# Go through and save experiments to files:
 
 for expno in range(len(MOCfile.experiment)):
     print("Writing experiment #",expno)
     MST.WriteExperimentToXLSX(MOCfile.experiment[expno],"experiment"+str(expno)+".xlsx")
-    
+
+# alternatively use "MOCfile.SaveXLSX()" to save all experiments (see example.py)
+
 print("Finished exporting!")
 MOCfile.close()
