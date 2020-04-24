@@ -6,7 +6,7 @@ NanoTemper MST instruments produce data in a custom .MOC format that requires sp
 ![OpenMST graphic](/images/OpenMST.jpg)
 ## Installation
 
-Simply download **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** and place in the folder with your MOC files and import it with ```import MSTProcess```.  See the examples for simple usage, and also [More advanced usage](#more-advanced-usage).  
+Simply download **[MSTProcess.py](https://raw.githubusercontent.com/shepherdingelectrons/OpenMST/master/MSTProcess.py)** and place in the folder with your MOC files and import it with ```import MSTProcess```.  See the examples for simple [usage](#usage), and also [More advanced usage](#more-advanced-usage).  
 
 **NOTICE: The OpenMST script doesn't modify the MOC files, but work with copies of the MOC file to be safe**
 
@@ -72,9 +72,8 @@ Finished exporting!
 ```
 If you see this text - congratulations - you have successfully set everything up and you have just processed your file! Look in the same folder as the MOC files, and you'll see the extracted MST data in the excel files, one per experiment.  Good luck!
 
-## More advanced usage
-We can open a .MOC file and perform processing on all the contained experiments, including populating each experiment with all the relevant capillary data with ```Process()```.
-
+## Usage
+We can open a .MOC file, extract all the interesting data from each experiment, and then save each experiment with an Excel file with minimal code:
 ```python
 import MSTProcess as MST
 
@@ -82,8 +81,10 @@ MOCfile = MST.openMOCFile('Your_filename_here.moc')
 MOCfile.SaveXLSX() 
 MOCfile.close()
 ```
+By changing "Your_filename_here.moc" to the desired filename, this code alone is sufficient for most cases.
 
-The above code is sufficient for extracting all data from .MOC for viewing in Excel.  The experiment object of 'MOCfile' holds various bits of experiment-level data including an array of capillary objects (```.capillary```), experiment annotation ```(.experiment_annotation```) and other associated data (```.info```).  We can examine this, i.e. for experiment #2:
+## More advanced usage
+The experiment object of 'MOCfile' holds various bits of experiment-level data including an array of capillary objects (```.capillary```), experiment annotation ```(.experiment_annotation```) and other associated data (```.info```).  We can examine this, i.e. for experiment #2:
 ```python
 import MSTProcess as MST
 MOCfile = MST.openMOCFile('Your_filename_here.moc')
