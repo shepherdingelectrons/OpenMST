@@ -1,7 +1,7 @@
-import OpenMST.MSTProcess as MST
+import MSTProcess as MST
 
 print("Opening file")
-MOCfile = MST.openMOCFile('Your filename here.MOC')
+MOCfile = MST.openMOCFile('Your_filename_here.moc')
 
 print("Saving experiments to XLSX files")
 MOCfile.SaveXLSX() 

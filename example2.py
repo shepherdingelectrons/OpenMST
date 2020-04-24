@@ -1,6 +1,6 @@
-import OpenMST.MSTProcess as MST
+import MSTProcess as MST
 
-MOCfile = MST.openMOCFile('Your filename here.moc')
+MOCfile = MST.openMOCFile('Your_filename_here.moc')
 
 # Get machine info
 machinfo = MOCfile.getMachineInfo()
