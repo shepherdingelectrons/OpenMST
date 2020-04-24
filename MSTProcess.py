@@ -12,6 +12,8 @@ def ExtractMSTTrace(blob, norm=False):
     if blob==None:
         #print("Error: this is a non-MST trace containing entry")
         return (["No data"],["No data"])
+    elif len(blob)==0:
+        return (["No data"],["No data"])
         
     while i<len(blob):
         a = blob[i:i+8]
@@ -24,7 +26,12 @@ def ExtractMSTTrace(blob, norm=False):
 
     if norm==True:# Normalise data before returning it       
         total = [y[i] for i,x in enumerate(x) if x<0]
-        average = sum(total)*1.0/len(total)
+
+        if len(total)==0: # some data is already normalised to 1000
+            average = 1000.0
+        else:
+            average = sum(total)*1.0/len(total)
+
         y = [1000.0*j/average for j in y]
     
     return (x,y)
@@ -37,6 +44,11 @@ def ExtractCapTrace(blob, xoffset=0, norm=False):
         if blob==None:
             #print("Error: this is not a valid Cap trace containing entry")
             return (["No data"],["No data"])
+        elif len(blob)==0:
+            return (["No data"],["No data"])
+
+        if xoffset == None: #CenterPosition was invalid for some reason - possibly an earlier file format issue
+            xoffset = 0
             
         while i<len(blob):
             a = blob[i:i+16]
@@ -54,9 +66,12 @@ def ExtractCapTrace(blob, xoffset=0, norm=False):
 
 def checkisSingle(array, arrayname, ident, identname):
     if len(array)==0:
-        print("ERROR: ",array.name,"NOT FOUND for ",identname,"=",tcontID)
+        print("ERROR: ",arrayname,"NOT FOUND for ",identname,"=",ident)
+        return True
     elif len(array)>1:
-        print("ERROR: Multiple ",array.name,"found for ",identname,"=",tcontID)
+        print("ERROR: Multiple ",arrayname,"found for ",identname,"=",ident)
+        return True
+    return 0
 
 ##def getScanCapIDs(cursor, expID):
 ##    # returns a list of scancap IDs from the mcapScan (capillary scanning) table for each experiment (expID)
@@ -145,8 +160,9 @@ class MSTExperiment:
             # MST trace handling
             mMSTID = self.getMSTIDsfromCapID(capid) # should be only a single MST entry per capillary experiment
             MSTinfo = self.getMSTInfo(mMSTID)
-            self.capillary[i].MST_trace = MSTinfo["MstTrace"]
-            MSTinfo.pop("MstTrace")
+            if len(MSTinfo)>0: # we have a valid return from getMSTInfo
+                self.capillary[i].MST_trace = MSTinfo["MstTrace"]
+                MSTinfo.pop("MstTrace")
             self.capillary[i].MSTinfo = MSTinfo
 
             annons = self.getAnnotations(self.capillary[i].capinfo)
@@ -163,16 +179,25 @@ class MSTExperiment:
     def getMSTInfo(self, MSTcapID):
     # Use an experiment from mMST to fetch interesting data: ExcitationPower, MstPower, MstTrace, NominalDurationOfPhase1, NominalDurationOfPhase2, NominalDurationOfPhase3, NominalDurationOfPhase1,State,
     # If State=0, data is valid, else State=1 seems to mean some kind of non-data table entry
+
         fields = ["ExcitationPower", "MstPower", "NominalDurationOfPhase1", "NominalDurationOfPhase2", "NominalDurationOfPhase3", "State","MstTrace"]
         fieldstr = ", ".join(fields)
         self.cursor.execute("SELECT "+fieldstr+" FROM mMST WHERE ID='"+MSTcapID+"'")
-        MSTinfo = {fields[i]:x for i,x in enumerate(self.cursor.fetchall()[0])}
+       
+        MSTinfo = self.cursor.fetchall()
+
+        if len(MSTinfo)==0: # If we didn't find the MSTinfo from MSTcapID
+            MSTinfo = {}
+        else:
+            MSTinfo = {fields[i]:x for i,x in enumerate(MSTinfo[0])}
+            
         return MSTinfo
 
     def getMSTIDsfromCapID(self, capID):
         self.cursor.execute("SELECT ID FROM mMST WHERE Container='"+capID+"'")
         capids = [x[0] for x in self.cursor.fetchall()]
-        checkisSingle(capids, "capids", capID, "capID")
+
+        if checkisSingle(capids, "capids", capID, "capID"): capids = [""] # Return nothing if failed
         return capids[0]
 
     def getScanCapInfo(self, scancapID):
@@ -205,11 +230,12 @@ class MSTExperiment:
     
     def getAnnotations(self, data):
         annon_dicts = []
-        if data["Annotations"]!="":
-            annon = data["Annotations"].split(";")
-            for a in annon:
-                text = getAnnotationbyID(self.cursor, a) # returns a dictionary of associated text
-                annon_dicts.append(text) # build an array of dictionaries as there are multiple annotation lines
+        if "Annotations" in data.keys():
+            if data["Annotations"]!="":
+                annon = data["Annotations"].split(";")
+                for a in annon:
+                    text = getAnnotationbyID(self.cursor, a) # returns a dictionary of associated text
+                    annon_dicts.append(text) # build an array of dictionaries as there are multiple annotation lines
         return annon_dicts
 
 def openMOCFile(filename):
@@ -229,13 +255,21 @@ class MSTFile:
         self.filebase = filename.split('.')[0]
 
         self.experiment = []
-
+        self.validtables = []
+        
+        self.getTableList()
         self.Process() # Experiment information is now extracted automatically
 
+    def getTableList(self):
+        self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        self.validtables = [x[0] for x in self.cursor.fetchall()]
+        
     def getMachineInfo(self):
-        self.cursor.execute("SELECT DeviceType, SerialNumber, MacAddress FROM tDevice")
-        info = [x for x in self.cursor.fetchall()[0]]
-        self.DeviceType, self.SerialNumber, self.MacAddress = info
+        info = []
+        if "tDevice" in self.validtables:
+            self.cursor.execute("SELECT DeviceType, SerialNumber, MacAddress FROM tDevice")
+            info = [x for x in self.cursor.fetchall()[0]]
+            self.DeviceType, self.SerialNumber, self.MacAddress = info
         return info
 
     def getAllExperiments(self, verbose=True):
@@ -256,6 +290,7 @@ class MSTFile:
             self.experiment[i].caption = caption
             self.experiment[i].cursor = self.cursor # pass on DB reference
 
+            info = {} 
             # Extract different bits of information depending on experiment type
             if aSeriesID in ExpertModeaIDs:
                 self.experiment[i].expert = True
@@ -268,7 +303,7 @@ class MSTFile:
 
             exp_annon = self.experiment[i].getAnnotations(self.experiment[i].info)
             self.experiment[i].experiment_annotation = exp_annon
-            self.experiment[i].info.pop("Annotations")
+            if "Annotations" in self.experiment[i].info.keys(): self.experiment[i].info.pop("Annotations")
 
             if verbose: print("Experiment #",i,":OK")
 
@@ -291,13 +326,18 @@ class MSTFile:
             if verbose: print("Capillary data for experiment #",i,":OK")
 
     def getExpertModeaIDs(self):
-        self.cursor.execute("SELECT TopmostAction FROM ExpertModeEntity")
-        expertModeIDs = [x[0] for x in self.cursor.fetchall()]
+        expertModeIDs = []
+        if "ExpertModeEntity" in self.validtables:
+            self.cursor.execute("SELECT TopmostAction FROM ExpertModeEntity")
+            expertModeIDs = [x[0] for x in self.cursor.fetchall()]
+            
         return expertModeIDs
 
     def getBindingAffinityaIDs(self):
-        self.cursor.execute("SELECT TopmostAction FROM BindingAffinityEntity")
-        bindingAffinityIDs = [x[0] for x in self.cursor.fetchall()]
+        bindingAffinityIDs = []
+        if "BindingAffinityEntity" in self.validtables:
+            self.cursor.execute("SELECT TopmostAction FROM BindingAffinityEntity")
+            bindingAffinityIDs = [x[0] for x in self.cursor.fetchall()]
         return bindingAffinityIDs
 
     def getExpertModeInfo(self, aSeriesID):
@@ -320,9 +360,16 @@ class MSTFile:
 
     def _getaSeriesCaption(self, aSeriesID):
         self.cursor.execute("SELECT Caption FROM aSeries WHERE ID='"+aSeriesID+"'")
-        caption = self.cursor.fetchall()[0]
-        checkisSingle(caption, 'caption', aSeriesID,"aSeriesID")
-        return caption[0]
+        caption = self.cursor.fetchall()#[0]
+
+        if len(caption)==0:
+            caption = ""
+        else:
+            caption = caption[0]
+            checkisSingle(caption, 'caption', aSeriesID,"aSeriesID")
+            caption = caption[0]
+            
+        return caption
             
     def _gettContainerIDs(self):
         self.cursor.execute("SELECT ID FROM tContainer")
@@ -333,9 +380,16 @@ class MSTFile:
         # This appears to build an bridge between experiment ID (i.e aSeries:ID)
         # and tContainer ID.
         self.cursor.execute("SELECT ParentAction FROM aHandling WHERE Container='"+tcontID+"'")
-        aSeriesID = [x for x in self.cursor.fetchall()[0]]
-        checkisSingle(aSeriesID, "aSeriesID", tcontID, "tcontID")
-        return aSeriesID[0]   
+
+        aSeriesID = self.cursor.fetchall()
+
+        if len(aSeriesID)==0:
+            aSeriesID=""
+        else:
+            aSeriesID = [x for x in aSeriesID[0]]
+            checkisSingle(aSeriesID, "aSeriesID", tcontID, "tcontID")
+            aSeriesID = aSeriesID[0]
+        return aSeriesID
 
     def close(self):
         self.conn.close()
@@ -380,7 +434,14 @@ def WriteExperimentToXLSX(experiment, filename):
     row+=1
     writeheader=True
     MSTrow = row+2+len(experiment.capillary)
-    notdeleted = 1-experiment.info["IsDeleted"]
+
+    notdeleted = 1
+    if "IsDeleted" in experiment.info.keys():
+        notdeleted = 1-experiment.info["IsDeleted"]
+
+    if len(experiment.capillary)==0:
+        print("Empty experiment: No capillary data recovered")
+        return
     
     for i,cap in enumerate(experiment.capillary):
         width = len(cap.capinfo)
