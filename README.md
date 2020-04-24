@@ -19,7 +19,7 @@ Open IDLE and try ```import OpenMST.MSTProcess as MST``` .  No error will indica
 
 ## Dependencies 
 
-**sqlite3** - OpenMST was tested in Python 3.2.2, and uses sqlite3 which comes with this version of Python.  It might need to be installed if you're using a different version of Python 
+~~**sqlite3** - OpenMST was tested in Python 3.2.2, and uses sqlite3 which comes with this version of Python.  It might need to be installed if you're using a different version of Python~~ Python 3 comes with sqlite3 as standard
 
 **xlsxwriter** - Used for exporting extracted data to Excel, in table format and generating the capillary scan and MST trace charts. Only used if saving to XLSX. 
 
