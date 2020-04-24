@@ -91,7 +91,7 @@ MOCfile = MST.openMOCFile('Your_filename_here.moc')
 MOCfile.SaveXLSX() 
 MOCfile.close()
 ```
-By changing "Your_filename_here.moc" to the desired filename, this code alone is sufficient for most cases.
+By changing "Your_filename_here.moc" to the desired filename, this code alone is sufficient for most cases.  Of course if you have setup MSTProcess as a site-package then you should use ```import OpenMST.MSTProcess as MST```.
 
 ## More advanced usage
 The experiment object of 'MOCfile' holds various bits of experiment-level data including an array of capillary objects (```.capillary```), experiment annotation ```(.experiment_annotation```) and other associated data (```.info```).  We can examine this, i.e. for experiment #2:
