@@ -66,10 +66,10 @@ def ExtractCapTrace(blob, xoffset=0, norm=False):
 
 def checkisSingle(array, arrayname, ident, identname):
     if len(array)==0:
-        print("ERROR: ",arrayname,"NOT FOUND for ",identname,"=",ident)
+        #print("ERROR: ",arrayname,"NOT FOUND for ",identname,"=",ident)
         return True
     elif len(array)>1:
-        print("ERROR: Multiple ",arrayname,"found for ",identname,"=",ident)
+        #print("ERROR: Multiple ",arrayname,"found for ",identname,"=",ident)
         return True
     return 0
 
@@ -118,11 +118,14 @@ class MSTExperiment:
         self.cursor = None
         self.capillary = []
         self.experiment_annotation = []
+        self.ignorecount = 0
 
     def getCapillaryData(self):
         if self.aSeriesID==None:
             print("ERROR: aSeriesID not valid. run getAllExperiments() on MSTFile object to extract experiments")
 
+        self.ignorecount = 0
+        
         # Use tContID
         CapIDs = self._getCapillaryIDs(self.tContID)
         for i,capid in enumerate(CapIDs):
@@ -197,7 +200,9 @@ class MSTExperiment:
         self.cursor.execute("SELECT ID FROM mMST WHERE Container='"+capID+"'")
         capids = [x[0] for x in self.cursor.fetchall()]
 
-        if checkisSingle(capids, "capids", capID, "capID"): capids = [""] # Return nothing if failed
+        if checkisSingle(capids, "capids", capID, "capID"):
+            capids = [""] # Return nothing if failed
+            self.ignorecount+=1
         return capids[0]
 
     def getScanCapInfo(self, scancapID):
@@ -323,7 +328,12 @@ class MSTFile:
     def getAllCapillaryData(self, verbose=True):
         for i in range(len(self.experiment)):
             self.experiment[i].getCapillaryData()
-            if verbose: print("Capillary data for experiment #",i,":OK")
+            if verbose:
+                if self.experiment[i].ignorecount == 0:
+                    print("Capillary data for experiment #",i,":OK")
+                else:
+                    print("Capillary data for experiment #",i,"(",self.experiment[i].ignorecount,") warnings")
+
 
     def getExpertModeaIDs(self):
         expertModeIDs = []
