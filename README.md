@@ -66,14 +66,24 @@ You should see the following Python code in the IDLE window:
 
 Simply change 'Your_filename_here.moc' to the MOC filename in the same folder that you want to process (keeping the filename within the quotation marks).  Press F5 to run the script, or from the menu at the top of the editor, Run--> Run Module.  All things being well, you should see:
 ```
-Processing file
+Opening file
+Extracting experimental data from file: Your_filename_here.MOC
+Experiment # 0 :OK
+Experiment # 1 :OK
+Experiment # 2 :OK
+Number of experiments extracted: 3
+Extracting capillary data
+Capillary data for experiment # 0 :OK
+Capillary data for experiment # 1 :OK
+Capillary data for experiment # 2 :OK
+Done!
 Saving experiments to XLSX files
 Finished exporting!
 ```
-If you see this text - congratulations - you have successfully set everything up and you have just processed your file! Look in the same folder as the MOC files, and you'll see the extracted MST data in the excel files, one per experiment.  Good luck!
+If you see something like this text - congratulations - you have successfully set everything up and you have just processed your file! Look in the same folder as the MOC file, and you'll see the extracted MST data in the excel files, one per experiment.  Good luck!
 
 ## Usage
-We can open a .MOC file, extract all the interesting data from each experiment, and then save each experiment with an Excel file with minimal code:
+We can open a .MOC file, extract all the interesting data from each experiment, and then save each experiment as an Excel file with minimal code:
 ```python
 import MSTProcess as MST
 
@@ -86,9 +96,6 @@ By changing "Your_filename_here.moc" to the desired filename, this code alone is
 ## More advanced usage
 The experiment object of 'MOCfile' holds various bits of experiment-level data including an array of capillary objects (```.capillary```), experiment annotation ```(.experiment_annotation```) and other associated data (```.info```).  We can examine this, i.e. for experiment #2:
 ```python
-import MSTProcess as MST
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
-
 exp2 = MOCfile.experiment[2]
 print("Annotation and data associated with Experiment #2:")
 print(exp2.info)
@@ -96,9 +103,6 @@ print(exp2.experiment_annotation)
 ```
 The capillary data can also be examined.  Capillary objects contain a couple of dictionaries with relevant information, .capinfo and .MSTinfo.  The centre position of the capillary (in millimetres) is stored in .CenterPosition. We can inspect this data, i.e. capillary #5 in experiment #2:
 ```python
-import MSTProcess as MST
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
-
 print("Capillary #5 in Experiment #2")
 cap5 = MOCfile.experiment[2].capillary[5]
 print(cap5.capinfo)
@@ -107,9 +111,6 @@ print(cap5.CenterPosition)
 ```
 The raw data of the pre/post capillary scans and the MST traces themselves are extracted from the .MOC file as a byte array.  The pre-MST capillary scan, the post-MST capillary scan and the MST trace are saved in the capillary object as blobs, under the names; .preMST, .postMST and .MST_trace respectively.  The functions to convert the blobs to understandable data are ```MST.ExtractMSTTrace``` and ```MST.ExtractCapTrace```.  Two arrays are returned from each functions with the extracted data:
 ```python
-import MSTProcess as MST
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
-
 cap5 = MOCfile.experiment[0].capillary[5] # For readability, get a reference to the capillary #5 of experiment 0
 
 time_s, fluorescence = MST.ExtractMSTTrace(cap5.MST_trace) # Unnormalised MST trace
@@ -119,9 +120,6 @@ distance_post, postMST_scan = MST.ExtractCapTrace(cap5.postMST) # Raw capillary 
 ```
 The time is in seconds in the MST_trace, and the distance for the capillary scans is in millimetres. The MST data is normalised in the Excel output files, but is UNnormalised by default.  By specifying the parameter ```norm=True``` in the ExtractMSTTrace and ExtractCapTrace functions, normalised data is returned.  In the case of capillary scans, it is sometimes useful to make the distance measurement relative to the centre of capillary.  This is achieved by specifying ```xoffset```, like so:
 ```python
-import MSTProcess as MST
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
-
 cap5 = MOCfile.experiment[0].capillary[5] # For readability, get a reference to capillary #5 of experiment 0
 centerpos = cap5.CenterPosition # grab stored CenterPosition
 
@@ -134,9 +132,6 @@ distance_post, postMST_scan = MST.ExtractCapTrace(cap5.postMST, xoffset=centerpo
 ```
 We can also choose which individual experiments to save, and what to call them using ```MST.WriteExperimentToXLSX```. To save experiment #0 as 'myoutput.xlsx':
 ```python
-import MSTProcess as MST
-MOCfile = MST.openMOCFile('Your_filename_here.moc')
-
 MST.WriteExperimentToXLSX(MOCfile.experiment[0],"myoutput.xlsx")
 ```
 Remember we can also save all the experiments in the MOC file to separate XLSX files using ```SaveXLSX()```.
